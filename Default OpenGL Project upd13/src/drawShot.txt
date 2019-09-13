@@ -1,0 +1,40 @@
+void drawShot(
+	float centerX, float centerY,
+float aVar,
+float abRatioVar,
+float angleVar
+)
+{
+	shot.a = aVar;
+	shot.abRatio = abRatioVar;
+	shot.angle = angleVar;
+	shot.positionsRec[0] = 0.5f * shot.a;
+	shot.positionsRec[1] = 0.5f * shot.a/ shot.abRatio;
+
+	shot.positionsRec[2] = -0.5f * shot.a;
+	shot.positionsRec[3] = 0.5f * shot.a / shot.abRatio;
+
+	shot.positionsRec[4] = 0.5f * shot.a;
+	shot.positionsRec[5] = -0.5f * shot.a / shot.abRatio;
+
+	shot.positionsRec[6] = -0.5f * shot.a;
+	shot.positionsRec[7] = -0.5f * shot.a / shot.abRatio;
+
+	for (short i = 0; i < 4; i++)
+	{
+		positionsHex[2 * i] = shot.positionsRec[2 * i] * cos(shot.angle)
+			- shot.positionsRec[2 * i + 1] * sin(shot.angle) ;
+		positionsHex[2 * i] = positionsHex[2 * i] / ratio + centerX;
+
+		positionsHex[2 * i + 1] = shot.positionsRec[2 * i] * sin(shot.angle)
+			+ shot.positionsRec[2 * i + 1] * cos(shot.angle) + centerY;
+		
+	}
+	drawArrays(
+		1,
+		location,
+		1.0f, 1.0f, 1.0f,
+		GL_TRIANGLE_STRIP,
+		4
+	);
+}

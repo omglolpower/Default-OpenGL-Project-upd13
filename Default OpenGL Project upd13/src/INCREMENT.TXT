@@ -1,0 +1,10 @@
+if (centerX > 0.3f)
+			IP = -0.01f;
+		if (centerX < -0.3f)
+			IP = 0.01f;
+		centerX = centerX + incrPos;
+		if (red > 1.0f)
+			I = -0.05f;
+		if (red < 0.0f)
+			I = 0.05f;
+		R = R + increment;

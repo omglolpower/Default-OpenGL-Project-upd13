@@ -1,0 +1,179 @@
+#include <iostream>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <math.h>
+#include <streambuf>
+#include <conio.h>
+#include <Windows.h>
+#define LOG(x) std::cout << x << std::endl;
+#define PI() 3.14159265
+
+//this f-tion will compile shaders:
+static unsigned int CompileShader(unsigned int type, const std::string& source)
+{
+	unsigned int id = glCreateShader(type);
+	const char* src = source.c_str();
+	glShaderSource(id, 1, &src, nullptr);
+	glCompileShader(id);
+
+	//error handling:
+
+	int result;
+
+	glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+	if (result == GL_FALSE)
+	{
+		int length;
+		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+		char* message = (char*)alloca(length * sizeof(char));
+		glGetShaderInfoLog(id, length, &length, message);
+		std::cout << "Failed to compile " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment")
+			<< "shader!" << std::endl;
+		std::cout << message << std::endl;
+		glDeleteShader(id);
+		return 0;
+	}
+
+	return id;
+}
+
+static int CreateShader(const std::string& vertexShader, const std::string& fragmentShader) //
+	// this function will provide opengl with shader source code
+{
+	unsigned int program = glCreateProgram();
+
+
+	unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
+	unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
+
+	glAttachShader(program, vs);
+	glAttachShader(program, fs);
+	glLinkProgram(program);
+	glValidateProgram(program);
+
+	glDeleteShader(vs);
+	glDeleteShader(fs);
+
+	return program;
+}
+
+
+//some variables for circle positioning and color:
+float red = 0.0f;
+float increment = 0.05f;
+float incrPos = 0.05f;
+float positions[724];
+unsigned int indices[362];
+unsigned int ibo;
+float IncX = 0.0f;
+float IncY = 0.0f;
+float scale = 1.0f;
+short length = 1280;
+short heigth = 720;
+float ratio = (float)length / (float)heigth;
+float R;
+
+//reading shaders from files:
+std::ifstream ssvs("C:\\dev\\shaders\\BasicVertexShader.txt");
+std::ifstream ssfs("C:\\dev\\shaders\\UniformBasicFragmentShader.txt");
+std::ostringstream ossvs, ossfs;
+std::string vertexShader;
+
+std::string fragmentShader;
+
+//this function will draw a circle:
+
+float radius[2] = { 0.4f, 0.5f };
+float heigth = 0.4f;
+float length = 0.25f;
+float gap = 1.02f;
+void hexagon(float heigth1, float heigth2, float length, float centerX, float centerY, float scale)
+{
+	
+	for (int i = 0; i < 362; i++)
+	{
+		positions[2 * i] = (length * scale + centerX) / ratio;
+		positions[2*i+1] = (heigth1 * scale + centerY) ;
+	}
+	unsigned int buffer; //id of buffer
+	glGenBuffers(1, &buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0,
+		2,
+		GL_FLOAT,
+		GL_FALSE,
+		sizeof(float) * 2,
+		0);
+
+
+	glGenBuffers(2, &ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	unsigned int shader = CreateShader(vertexShader, fragmentShader);
+	glUseProgram(shader);
+	int location = glGetUniformLocation(shader, "u_Color");
+
+
+
+	glUniform4f(location, 0.3, 0.2, 0.2f, 1.0f);
+	glDrawElements(GL_TRIANGLE_STRIP, 362, GL_UNSIGNED_INT, nullptr);
+}
+
+
+//main function. creating window, context, etc.:
+int main(void)
+{
+	GLFWwindow* window;
+
+	if (!glfwInit())
+		return -1;
+
+	window = glfwCreateWindow(length, heigth, "Hello World", NULL, NULL);
+	if (!window)
+	{
+		glfwTerminate();
+		return -1;
+	}
+
+	glfwMakeContextCurrent(window);
+
+	glfwSwapInterval(1);
+
+	if (glewInit() != GLEW_OK)
+		std::cout << "error" << std::endl;
+	std::cout << glGetString(GL_VERSION) << std::endl;
+	
+	for (int i = 0; i < 362; i++)
+	{
+		indices[i] = i;
+	}
+	ossvs << ssvs.rdbuf();
+	ossfs << ssfs.rdbuf();
+
+	vertexShader = ossvs.str();
+	fragmentShader = ossfs.str();
+	
+	// here a window will be refreshed:
+	while (!glfwWindowShouldClose(window))
+	{
+		
+		glClear(GL_COLOR_BUFFER_BIT);
+		
+		glfwSwapBuffers(window);
+
+		glfwPollEvents();
+	}
+
+
+
+	glfwTerminate();
+	return 0;
+}

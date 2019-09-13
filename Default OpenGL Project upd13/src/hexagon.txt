@@ -1,0 +1,34 @@
+void circle(float centerX, float centerY, float radius, float red, float green, int locationVar)
+{
+	positions[0] = centerX;
+	positions[1] = centerY;
+	for (int i = 0; i < 361; i++)
+	{
+		positions[(i + 1) * 2] = cos(PI() / 180 * i) * radius * scale / ratio + centerX;
+		positions[2 * (i + 1) + 1] = sin(PI() / 180 * i) * radius * scale + centerY;
+	}
+	
+	glGenBuffers(1, &buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0,
+		2,
+		GL_FLOAT,
+		GL_FALSE,
+		sizeof(float) * 2,
+		0);
+
+
+	glGenBuffers(2, &ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	
+
+
+
+	glUniform4f(locationVar, red, green, 0.8f, 1.0f);
+	glDrawElements(GL_TRIANGLE_FAN, 362, GL_UNSIGNED_INT, nullptr);
+}

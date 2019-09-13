@@ -1,0 +1,18 @@
+unsigned int indicesHexA[] =
+{
+	2, 6,
+	1, 6,
+	3, 5,
+	0, 5,
+	2, 4,
+	1, 4
+};
+unsigned int indicesHexB[] =
+{
+	6, 2,
+	6, 1,
+	5, 3,
+	5, 0,
+	4, 2,
+	4, 1
+};

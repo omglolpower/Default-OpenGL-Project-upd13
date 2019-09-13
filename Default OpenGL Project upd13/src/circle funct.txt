@@ -1,0 +1,79 @@
+void circle(float centerX,float centerY,float red,float increment,float incrPos)
+{
+	//circle parameters:
+	float scale = 1.0f;
+	float radius = 0.5f;
+	float positions[1000];
+	//coordinates for vertices of triangles:
+	for (int i = 0; i < 1000; i++)
+	{
+		positions[i] = 0.0f;
+	}
+	if (centerX > 0.3f)
+		incrPos = -0.01f;
+	if (centerX < -0.3f)
+		incrPos = 0.01f;
+	centerX = centerX + incrPos;
+
+	positions[0] = centerX;
+	positions[1] = centerY;
+	for (int i = 0; i < 361; i++)
+	{
+
+		positions[(i + 1) * 2] = cos(PI() / 180 * i) * radius * scale + centerX;
+
+		positions[2 * (i + 1) + 1] = sin(PI() / 180 * i) * radius * scale + centerY;
+	}
+
+	unsigned int indices[362];
+	for (int i = 0; i < 362; i++)
+	{
+		indices[i] = i;
+	}
+
+	unsigned int buffer; //id of buffer
+	glGenBuffers(1, &buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW); //specify the data
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0,
+		2,
+		GL_FLOAT,
+		GL_FALSE,
+		sizeof(float) * 2,
+		0);
+
+	unsigned int ibo; //id of buffer
+	glGenBuffers(2, &ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_DYNAMIC_DRAW);
+
+
+	std::ifstream ssvs("C:\\dev\\shaders\\BasicVertexShader.txt");
+	std::ifstream ssfs("C:\\dev\\shaders\\UniformBasicFragmentShader.txt");
+	std::ostringstream ossvs, ossfs;
+	ossvs << ssvs.rdbuf();
+	std::string vertexShader = ossvs.str();
+	ossfs << ssfs.rdbuf();
+	std::string fragmentShader = ossfs.str();
+
+
+	// <---------
+
+
+
+	unsigned int shader = CreateShader(vertexShader, fragmentShader);
+	glUseProgram(shader);
+	int location = glGetUniformLocation(shader, "u_Color");
+
+
+	/* Render here */
+	
+	if (red > 1.0f)
+		increment = -0.05f;
+	if (red < 0.0f)
+		increment = 0.05f;
+	red = red + increment;
+	glUniform4f(location, red, 0.3f, 0.8f, 1.0f);
+}

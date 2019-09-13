@@ -1,0 +1,19 @@
+for (short i = 1; i <= hitCounter; i++)
+		{
+			hexagon(
+				0.0, 0.0f,
+				location,
+				0.75f,
+				1.0f,
+				ratio,
+				1,
+				0.5);
+
+			drawArrays(
+				positionsHex,
+				location,
+				RED[2], GREEN[2], BLUE[2],
+				GL_TRIANGLE_STRIP,
+				6
+			);
+		}

@@ -1,0 +1,10 @@
+for (short i = 0; i < 4; i++)
+	{
+		positionsHex[2 * i] = shot.positionsRec[2 * i] * cos(shot.angle)
+			- shot.positionsRec[2 * i + 1] * sin(shot.angle) + centerX;
+		positionsHex[2 * i] = positionsHex[2 * i] / ratio;
+
+		positionsHex[2 * i + 1] = shot.positionsRec[2 * i] * cos(shot.angle)
+			+ shot.positionsRec[2 * i + 1] * sin(shot.angle) + centerY;
+		
+	}
