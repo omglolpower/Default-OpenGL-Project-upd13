@@ -14,5 +14,5 @@ upd3: now it's Shoot circles (https://youtu.be/nU0aaa26NyI).
 upd4: Added hit counter: a hexagon is drawn when circle is hit (https://youtu.be/DwZW59aAXGM).  
 upd5: Hit counter draws digits (https://youtu.be/pOu4aT2FsW0).  
 upd6: Modified the hit counter: the hit counter draws all numbers (0 -- inf) (https://youtu.be/osVphSgLV80).  
-upd7: added arrows controlled circle and a rectangle which further will be a projectile. it looks funny
+upd7: added arrows controlled circle and a rectangle which further will be a projectile. it looks funny  
 upd8: A circle controlled with arrows shoots a projectile ( a rectangle) where you aim with mouse
