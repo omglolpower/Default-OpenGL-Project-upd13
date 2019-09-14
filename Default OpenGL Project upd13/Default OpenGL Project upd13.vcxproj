@@ -201,6 +201,8 @@
     <Text Include="src\upd4.txt" />
     <Text Include="src\upd5.txt" />
     <Text Include="src\upd6.txt" />
+    <Text Include="src\upd8.txt" />
+    <Text Include="src\upd9.txt" />
     <Text Include="src\zero.txt" />
   </ItemGroup>
   <ItemGroup>

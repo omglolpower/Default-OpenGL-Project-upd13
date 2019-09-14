@@ -482,9 +482,6 @@ int main(void)
 
 	float CX[4] = { 0.0f, 0.0f, 0.0f };
 	float CY[4] = { 0.0f, 0.0f, 0.0f };
-	float projCentX[20] = { 0.0f };
-	float projCentY[20] = { 0.0f };
-
 	R = 0.03f;
 	const float IncX = 0.04f/ratio;
 	const float IncY = 0.04f;
@@ -492,22 +489,19 @@ int main(void)
 	bool checkIfLMBUp = true;
 	bool checkLMB = false;
 	bool checkLMBWasUp = true;
-	bool checkWaitProjectile[20] = { false };
+	bool checkWaitProjectile = false;
 	bool checkDrawTarget = true;
 	bool checkGenRand = true;
 	short hitCounter = 0;
-	short shotsNum = 0;
-	short cycle = 0;
-
 	std::string hitCounterString;
 	hitCounterString = std::to_string(hitCounter);
 	short wait = 15;
-	short waitProjectile[20] = { 0 };
+	short waitProjectile = 0;
 	short waitLMB = 0;
 	int intRnd;
 	float flRndX, flRndY;
 	float projectileSpeed=0.075f;
-	float angle[20] = { 0.0f };
+	float angle = 0.0f;
 	bool angleQ = 0;
 	unsigned int  shader = CreateShader(vertexShader, fragmentShader);
 	glUseProgram(shader);
@@ -515,20 +509,16 @@ int main(void)
 	glfwGetPrimaryMonitor();
 	std::cout << scale << std::endl;
 	std::cout << cos(0.0f) << std::endl;
-	glfwSetInputMode(window,
-		GLFW_CURSOR,
-		GLFW_CURSOR_DISABLED
-	);
+
 	while (!glfwWindowShouldClose(window))
 	{
 		check[4] = false;
-		if (cycle == 19)
-		{
-			
-			cycle = 0;
-		}
-			
-		
+		if (waitProjectile > 40)
+			waitProjectile = 0;
+		glfwSetInputMode(window,
+			GLFW_CURSOR,
+			GLFW_CURSOR_NORMAL
+		);
 		// 5) timer:
 		if (!checkDrawTarget)
 		{
@@ -572,53 +562,26 @@ int main(void)
 
 		if (waitLMB==1)
 		{
-			angle[cycle] = atan((CY[0] - CY[1]) / (CX[0] * ratio - CX[1] * ratio)) + angleQ * PI();
-			projCentX[cycle] = CX[1] + 0.25f * cos(angle[cycle]) / ratio;
-			projCentY[cycle] = CY[1] + 0.25f * sin(angle[cycle]);
-			checkWaitProjectile[cycle] = true;
-			cycle++;
-			shotsNum++;
+			angle = atan((CY[0] - CY[1]) / (CX[0] * ratio - CX[1] * ratio)) + angleQ * PI();
+			CX[3] = CX[1] + 0.25f * cos(angle) / ratio;
+			CY[3] = CY[1] + 0.25f * sin(angle);
+			checkWaitProjectile = true;
 		}
-		for (short i = 0; i < 20; i++)
-		if (checkWaitProjectile[i])
-			waitProjectile[i]++;
-		if (checkGenRand)
+		if (checkWaitProjectile)
+			waitProjectile++;
+		if (waitProjectile>0)
 		{
-			flRndX = ((float)((rand() & 80) - (rand() & 80))) / 100.0f;
-			flRndY = ((float)((rand() & 80) - (rand() & 80))) / 100.0f;
-			checkGenRand = false;
-		}
-		for (short i = 0; i < 20; i++)
-		{
-			if (waitProjectile[i] > 0)
-			{
-				drawShot(
-					projCentX[i],
-					projCentY[i],
-					0.2f,
-					2.0f,
-					angle[i]
-				);
-				projCentX[i] = projCentX[i] + projectileSpeed * cos(angle[i]) / ratio;
-				projCentY[i] = projCentY[i] + projectileSpeed * sin(angle[i]);
-				if (cycle == 19)
-					waitProjectile[i] = 0;
-			}
-			if (1.0f > (((flRndX - projCentX[i] / 1) / (0.13f / ratio)) * ((flRndX - projCentX[i] / 1) / (0.13f / ratio)) +
-				((flRndY - projCentY[i]) / 0.13f) * ((flRndY - projCentY[i]) / 0.13f)) && waitProjectile[i] != 0)
-			{
+			drawShot(
+				CX[3],
+				CY[3],
+				0.2f,
+				2.0f,
+				angle
+			);
+			CX[3] = CX[3] + projectileSpeed * cos(angle) / ratio;
+			CY[3] = CY[3] + projectileSpeed * sin(angle);
 
-				if (checkDrawTarget)
-				{
-					PlaySound(TEXT("mix3.wav"), NULL, SND_ASYNC);
-					hitCounter++;
-					hitCounterString = std::to_string(hitCounter);
-				}
-
-				checkDrawTarget = false; //llotable circle won't be drawn
-			}
 		}
-		
 	
 
 		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && CY[1] < 1.0f - 0.13f)
@@ -635,7 +598,12 @@ int main(void)
 		hits(hitCounterString);
 
 		// 2) generate random coordinates for "lootable" circle:
-		
+		if (checkGenRand)
+		{
+			flRndX = ((float)((rand() & 80) - (rand() & 80))) / 100.0f;
+			flRndY = ((float)((rand() & 80) - (rand() & 80))) / 100.0f;
+			checkGenRand = false;
+		}
 
 		// 3) draw "lootable" circle:
 		if (checkDrawTarget)
@@ -650,7 +618,19 @@ int main(void)
 		
 
 		// 4) check collision of circles:
-		
+		if (1.0f > (((flRndX - CX[3] / 1) / (0.13f / ratio)) * ((flRndX - CX[3] / 1) / (0.13f / ratio)) +
+			((flRndY - CY[3]) / 0.13f) * ((flRndY - CY[3]) / 0.13f)) && waitProjectile!=0)
+		{
+			
+			if (checkDrawTarget)
+			{
+				PlaySound(TEXT("mix3.wav"), NULL, SND_ASYNC);
+				hitCounter++;
+				hitCounterString = std::to_string(hitCounter);
+			}
+
+			checkDrawTarget = false; //llotable circle won't be drawn
+		}
 
 		//calling a circle function( a circle will be drawn):
 

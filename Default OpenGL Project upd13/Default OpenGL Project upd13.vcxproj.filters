@@ -76,6 +76,8 @@
     <Text Include="src\arrow controls.txt" />
     <Text Include="src\angle.txt" />
     <Text Include="src\drawShot.txt" />
+    <Text Include="src\upd8.txt" />
+    <Text Include="src\upd9.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
